@@ -25,11 +25,11 @@
 # $ cat docker-compose.yml | curl --user  malcocer:hackme.1234 -F c=@- https://ptpb.birras.pro/
 #
 # Open paste:
-# - https://ptpb.birras.pro/PX5O
+# - https://ptpb.birras.pro/iwYh
 #
 # ...or
 #
-# - https://ptpb.birras.pro/PX5O/yaml
+# - https://ptpb.birras.pro/iwYh/yaml
 
 version: '3.7'
 
