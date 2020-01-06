@@ -1,17 +1,72 @@
-version: '3.2'
+# Securing POST:
+
+# Run this on host:
+
+#  $ htpasswd -nb malcocer hackme.1234 >  /var/lib/docker/volumes/pb_vhosts/_data/pbhtpasswd
+#  $ { echo \
+#        "limit_except GET HEAD { auth_basic 'Restricted'; auth_basic_user_file /etc/nginx/vhost.d/pbhtpasswd; }"; \
+#    } > /var/lib/docker/volumes/pb_vhosts/_data/ptpb.birras.pro_location
+
+# Create new paste:
+# $ cmd | curl --user  malcocer:hackme.1234 -F c=@- https://ptpb.birras.pro/
+#
+
+version: '3.7'
 
 services:
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: jwilder/nginx-proxy:alpine
+    ports:
+      - "145.239.154.2:80:80"
+      - "145.239.154.2:443:443"
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - vhosts:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
+
+  nginx-proxy-letsencrypt:
+    container_name: nginx-proxy-letsencrypt
+    depends_on:
+      - nginx-proxy
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - vhosts:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - 'DEFAULT_EMAIL=m.alcocer1978@gmail.com'
+
+  mongodb:
+    depends_on:
+      - nginx-proxy
+      - nginx-proxy-letsencrypt
+    image: mongo:latest
+
   pb:
+    depends_on:
+      - nginx-proxy
+      - mongodb
+      - nginx-proxy-letsencrypt
     build:
       context: .
-    ports:
-      - '10002:10002'
+    expose:
+      - '10002'
     volumes:
       - .:/pb
     environment:
       - 'LISTEN_ADDRESS=::'
       - 'LISTEN_PORT=10002'
       - 'CDN_PREFIX=//d34zelngniy2d8.cloudfront.net'
+      - 'VIRTUAL_HOST=ptpb.birras.pro'
+      - 'VIRTUAL_PORT=10002'
+      - 'LETSENCRYPT_HOST=ptpb.birras.pro'
 
-  mongodb:
-    image: mongo:latest
+volumes:
+  certs:
+  vhosts:
+  html:
