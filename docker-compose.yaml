@@ -1,15 +1,35 @@
-# Securing POST:
-
+# pb:
+#   pb is a lightweight pastebin (and url shortener) built using flask.)
+#
+#
+# Original repositories:
+#   - https://github.com/jwilder/nginx-proxy
+#   - https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion
+#
+# Adapted by: Manuel Alcocer J. <m.alcocer1978@gmail.com>
+#   - https://github.com/manuel-alcocer/pb.git
+#
+#
+# Securing POST Method:
+# =====================
+#
 # Run this on host:
-
+#
 #  $ htpasswd -nb malcocer hackme.1234 >  /var/lib/docker/volumes/pb_vhosts/_data/pbhtpasswd
+#
 #  $ { echo \
 #        "limit_except GET HEAD { auth_basic 'Restricted'; auth_basic_user_file /etc/nginx/vhost.d/pbhtpasswd; }"; \
 #    } > /var/lib/docker/volumes/pb_vhosts/_data/ptpb.birras.pro_location
-
-# Create new paste:
-# $ cmd | curl --user  malcocer:hackme.1234 -F c=@- https://ptpb.birras.pro/
 #
+# Create new paste:
+# $ cat docker-compose.yml | curl --user  malcocer:hackme.1234 -F c=@- https://ptpb.birras.pro/
+#
+# Open paste:
+# - https://ptpb.birras.pro/PX5O
+#
+# ...or
+#
+# - https://ptpb.birras.pro/PX5O/yaml
 
 version: '3.7'
 
